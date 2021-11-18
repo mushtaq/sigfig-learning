@@ -10,10 +10,10 @@ object Future1 {
     val scheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
 
     val scheduledExecutorService2 = Executors.newSingleThreadScheduledExecutor()
-    implicit val ec2 = ExecutionContext.fromExecutorService(scheduledExecutorService2)
+    val ec2                       = ExecutionContext.fromExecutorService(scheduledExecutorService2)
 
     val scheduledExecutorService3 = Executors.newSingleThreadScheduledExecutor()
-    val ec3 = ExecutionContext.fromExecutorService(scheduledExecutorService3)
+    implicit val ec3              = ExecutionContext.fromExecutorService(scheduledExecutorService3)
 
     //    (1 to 100).foreach { x =>
     //      scheduledExecutorService.schedule(
@@ -44,7 +44,7 @@ object Future1 {
     //      future.foreach(result => println(x -> result))(ec2)
     //    }
 
-    val future: Future[Int] = Rbi.getPrice(10)(scheduledExecutorService)
+    val future: Future[Int]  = Rbi.getPrice(10)(scheduledExecutorService)
     val future2: Future[Int] = Rbi.getPrice(12)(scheduledExecutorService)
 
     val future3: Future[(Int, Int)] = future.zip(future2)
@@ -52,7 +52,6 @@ object Future1 {
     val future4: Future[Int] = future3.map { case (x1, x2) => x1 + x2 }(ec2)
 
     future4.foreach(result => println(result))(ec2)
-
 
     val value: Seq[Future[Int]] = (1 to 100).map(x => Rbi.getPrice(x)(scheduledExecutorService))
 
@@ -78,7 +77,7 @@ object Rbi {
     p.future
   }
 
-  def asyncValidate(accountId: Int, f: Boolean => Unit)(scheduler: ScheduledExecutorService) = {
+  def asyncValidate(accountId: Int, f: Boolean => Unit)(scheduler: ScheduledExecutorService): Unit = {
     val runnable: Runnable = () => f(true)
     scheduler.schedule(
       runnable,
